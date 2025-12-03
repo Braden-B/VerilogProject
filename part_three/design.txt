@@ -1,0 +1,95 @@
+// Name: Braden Begnaud and Chad Dauphiney
+// Course:  CMPS 430 - Fall 2025 
+// Assignment: Verilog Group Project 
+
+module partthree (
+    input reg clock,
+    input reg reset,
+    input reg f,
+  	input reg o,
+    output wire foo,
+    output wire off,
+    output wire otherOut
+);
+  	reg validFoo = 0;
+  	reg validOff = 0;
+    reg [2:0] state;   
+  
+  	assign foo = validFoo; // sets the output to the value of a flag, showing if its valid. Output is if neither are valid
+    assign off = validOff;
+    assign otherOut = ~(validFoo || validOff);
+  
+    always @(posedge clock or posedge reset) begin
+      if (reset) begin // set flags and state to baseline
+            state <= 3'b000;
+          	validFoo <= 0;
+          	validOff <= 0;
+        end 
+        else begin
+          validFoo <= 0; // clear the flags before each loop
+          validOff <= 0;
+          case (state)
+                3'b000: begin // State 0
+                  if (f) begin
+                    state <= 3'b001; // go to state 1
+                  end
+                  else if (o) begin
+                    state <= 3'b100; // go to state 4
+                  end
+                  else begin
+                    state <= 3'b000; // stay in default state
+                  end
+                end
+                3'b001: begin // State 1
+                  if (o) begin
+                    state <= 3'b010; // go to state 2
+                  end
+                  else begin
+                    state <= 3'b000;// revert to default state
+                  end
+                end
+                3'b010: begin // State 2
+                  if (f) begin
+                    state <= 3'b101; // go to state 5
+                  end
+                  else if (o) begin
+                    state <= 3'b011; // go to state 3
+                  end
+                  else begin
+                    state <= 3'b000; // revert to default state
+                  end
+                end
+           		3'b011: begin // State 3
+                  validFoo <= 1;
+                  state = 3'b100; //we found a foo so set the flag and revert to default
+                end
+                default: state <= 3'b000;
+            	3'b100: begin // State 4
+                  if (f) begin
+                    state <= 3'b101; // go to state 5
+                  end
+                  else begin
+                    state <= 3'b000; // revert to default
+                  end
+                end
+           		3'b101: begin // State 5
+                  if (f) begin
+                    state <= 3'b110; // go to state 6
+                  end
+                  else if (o) begin
+                    state <= 3'b010; // go to state 2
+                  end
+                  else begin
+                    state <= 3'b000; // revert to default
+                  end
+                end
+            	3'b110: begin // State 6
+                  validOff <= 1;
+                  state = 3'b100; //we found an off so set the flag and revert to default
+                end
+            endcase
+    	end
+    end
+ 
+
+endmodule

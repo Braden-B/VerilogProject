@@ -1,0 +1,76 @@
+// Name: Braden Begnaud and Chad Dauphiney
+// Course:  CMPS 430 - Fall 2025 
+// Assignment: Verilog Group project 
+module HW3_testbench;
+  
+   reg clk, rst, f, o;
+   wire foo, off, otherOut;
+   partthree DUT (clk, rst, f, o, foo, off, otherOut);
+     
+   initial begin
+   clk <= 0;
+   rst <= 0;
+        
+   #1 rst <= 1;
+   #100 rst <= 0;
+   end
+      
+   always #50 clk = ~clk;
+        
+   initial begin
+   	f <= 1'b0;
+   	o <= 1'b0;
+     
+    #1 
+     
+    #100
+    
+    f <= 1'b1; // sending in an f
+   	o <= 1'b0;
+    #100
+     
+    f <= 1'b1;
+   	o <= 1'b0;
+    #100
+     
+    f <= 1'b1;
+   	o <= 1'b0;
+    #100
+     
+    f = 1'b0; // sending in an o
+   	o <= 1'b1;
+    #100
+     
+    f <= 1'b0;
+   	o <= 1'b1;
+    #100
+     
+    f <= 1'b0; 
+    o <= 1'b1;
+    #100
+    
+    f <= 1'b1;
+   	o <= 1'b0;
+    #100
+      
+    f <= 1'b1;
+   	o <= 1'b0;
+    #100
+    
+     
+    
+    #100 // the offset of the input by 1 time unit made the module not display the final state so we pause a bit
+    
+     
+   $finish;
+    
+   end
+      
+   initial begin
+     $display("F  O      Foo  Off  Other  Clock  Reset");
+     $display("---------------------------------------");    
+     $monitor("%b  %b      %b    %b    %b      %b      %b", f, o, foo, off, otherOut, clk, rst);
+   end
+ 
+  
+endmodule
