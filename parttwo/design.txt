@@ -1,0 +1,102 @@
+// Name: Braden Begnaud and Chad Dauphiney
+// Course:  CMPS 430 - Fall 2025 
+// Assignment: Verilog Group Project 
+
+module parttwo(
+  input reg clock,
+  input reg reset,
+  input reg [1:0]temperature,
+  output wire fan,
+  output wire alarm,
+  output wire [1:0] FSM_state 
+);
+  
+  reg fanOn;
+  reg alarmOn;
+  reg [1:0] state;
+  
+  assign fan = fanOn;
+  assign alarm = alarmOn;
+  assign FSM_state = state;
+  
+  always @(posedge clock or posedge reset) begin
+      if (reset) begin // set flags and state to baseline
+            state <= 2'b00;
+          	fanOn <= 0;
+          	alarmOn <= 0;
+        end
+        else begin
+          case (state)
+                2'b00: begin // Normal Temp, assigns next temp 
+                  if (temperature == 2'b01) begin
+                    state <= 2'b01; 
+                  end
+                  else if (temperature == 2'b10)begin // warm temp
+                    state <= 2'b10; 
+                  end
+                  else if (temperature == 2'b11) begin // hot temp
+                    state <= 2'b11;
+                  end
+                  else begin // if something went wrong just set back to normal
+                    state <= 2'b00;
+                  end
+                end
+                2'b01: begin // Warm/Fan On Temp, fan on, then next temp
+                  if (temperature == 2'b01) begin
+                    state <= 2'b01; 
+                  end
+                  else if (temperature == 2'b10)begin
+                    state <= 2'b10; 
+                  end
+                  else if (temperature == 2'b11) begin
+                    state <= 2'b11;
+                  end
+                  else begin
+                    state <= 2'b00;
+                  end
+                end
+                2'b10: begin // Hot Temp, fan on alarm on
+                  if (temperature == 2'b01) begin
+                    state <= 2'b01; 
+                  end
+                  else if (temperature == 2'b10)begin
+                    state <= 2'b10; 
+                  end
+                  else if (temperature == 2'b11) begin
+                    state <= 2'b11;
+                  end
+                  else begin
+                    state <= 2'b00;
+                  end
+                end
+           		2'b11: begin // Critical Temp, stays stuck in this state
+                end
+            endcase
+        end
+  end
+ 
+  always @(*) begin // this updates the output wires alongside the state machine
+      fanOn = 0;    // I tried without this and it was heavily desynced
+      alarmOn = 0;
+
+      case (state)
+          2'b00: begin // Normal
+              fanOn = 0;
+              alarmOn = 0;
+          end
+          2'b01: begin // Warm, fan on
+              fanOn = 1;
+              alarmOn = 0;
+          end
+          2'b10: begin // Hot, fan and alarm on
+              fanOn = 1;
+              alarmOn = 1;
+          end
+          2'b11: begin // Critical, both are on, and the state won't change so they stay on
+              fanOn = 1;
+              alarmOn = 1;
+          end
+      endcase
+  end
+  
+endmodule

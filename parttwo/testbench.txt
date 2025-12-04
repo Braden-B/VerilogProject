@@ -1,0 +1,85 @@
+// Name: Braden Begnaud and Chad Dauphiney
+// Course:  CMPS 430 - Fall 2025 
+// Assignment: Verilog Group Project 
+
+module HW3_testbench;
+  
+  reg clk, rst;
+  reg [1:0] temperature;
+  wire fan, alarm;
+  wire [1:0] FSM_state;
+   
+   parttwo DUT (clk, rst, temperature, fan, alarm, FSM_state);
+     
+   initial begin
+   clk <= 0;
+   rst <= 0;
+        
+   #1 rst <= 1;
+   #100 rst <= 0;
+   end
+      
+   always #50 clk = ~clk;
+        
+   initial begin
+   	temperature <= 2'b00; // initialize to zero and wait, then run though the order in the rubric
+     
+    #1 
+     
+    #100
+    
+    temperature <= 2'b01;
+
+    #100
+
+    temperature <= 2'b10;
+
+    #100
+    
+    temperature <= 2'b01;
+
+    #100
+    
+    temperature <= 2'b00;
+
+    #100
+    
+    temperature <= 2'b11;
+
+    #100
+    
+    temperature <= 2'b10;
+
+    #100
+    
+    temperature <= 2'b01;
+
+    #100
+    
+    temperature <= 2'b00;
+
+    #100
+    
+    rst <= 1;
+     
+    #100
+     
+    rst <= 0;
+    
+    temperature <= 2'b00;
+    
+    #100 // the offset of the input by 1 time unit made the module not display the final state so we pause a bit
+    
+     
+   $finish;
+    
+   end
+      
+   initial begin
+     $display("Temperature  State  Fan  Alarm  Clock  Reset");
+     $display("--------------------------------------------");    
+     $monitor("%b           %b     %b    %b     %b     %b", temperature, FSM_state, fan, alarm, clk, rst);
+   end
+ 
+  
+endmodule
